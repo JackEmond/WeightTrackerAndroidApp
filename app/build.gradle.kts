@@ -61,6 +61,7 @@ dependencies {
     implementation("androidx.room:room-runtime:$room_version")
     kapt("androidx.room:room-compiler:$room_version")
 
+    implementation ("androidx.compose.runtime:runtime-livedata:1.5.4")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
 

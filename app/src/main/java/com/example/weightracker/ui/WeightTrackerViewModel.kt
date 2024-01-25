@@ -15,10 +15,17 @@ import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
 import androidx.compose.runtime.State
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.map
+import com.example.weightracker.data.local.WeightRecord
 
 data class AddWeightUiState(
     val weight: String = "",
     val date: String = "",
+)
+data class FormattedWeightRecord(
+    val weight: Float,
+    val date: String
 )
 
 @HiltViewModel
@@ -33,6 +40,24 @@ class WeightTrackerViewModel @Inject constructor(
     private val _navigateToNextScreen = mutableStateOf(false)
     val navigateToNextScreen: State<Boolean> = _navigateToNextScreen
 
+
+    fun getAllWeightsAndDates(): LiveData<List<FormattedWeightRecord>> {
+        return repository.getAllWeightsAndDates().map { list ->
+            list.map { weightRecord ->
+                FormattedWeightRecord(
+                    weight = weightRecord.weight,
+                    date = convertLongToDate(weightRecord.date)
+                )
+            }
+        }
+    }
+
+
+    private fun convertLongToDate(time: Long): String {
+        val date = Date(time)
+        val format = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+        return format.format(date)
+    }
 
     init {
         //update ui state to the current date
@@ -84,5 +109,7 @@ class WeightTrackerViewModel @Inject constructor(
     fun onNavigationDone() {
         _navigateToNextScreen.value = false
     }
+
+
 
 }

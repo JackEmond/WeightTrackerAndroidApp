@@ -47,7 +47,6 @@ fun AddWeightPage(
         }
     }
 
-
     /*
     LaunchedEffect(uiState.weight, uiState.date) {
         Log.d("AddWeightPage", "Weight: ${uiState.weight}, Date: ${uiState.date}")
@@ -116,16 +115,12 @@ fun DateInput(date: String, onDateChanged: (String) -> Unit) {
     }
 }
 
-
 @Composable
 fun SubmitButton(saveContent:() -> Unit) {
     Button(onClick = saveContent) {
         Text("Submit")
     }
 }
-
-
-
 
 @Preview(showBackground = true)
 @Composable
