@@ -1,5 +1,6 @@
 package com.example.weightracker.ui
 
+import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,13 +18,13 @@ import javax.inject.Inject
 import androidx.compose.runtime.State
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.map
-import com.example.weightracker.data.local.WeightRecord
 
 data class AddWeightUiState(
     val weight: String = "",
     val date: String = "",
 )
 data class FormattedWeightRecord(
+    val id: Int,
     val weight: Float,
     val date: String
 )
@@ -45,6 +46,7 @@ class WeightTrackerViewModel @Inject constructor(
         return repository.getAllWeightsAndDates().map { list ->
             list.map { weightRecord ->
                 FormattedWeightRecord(
+                    id = weightRecord.id,
                     weight = weightRecord.weight,
                     date = convertLongToDate(weightRecord.date)
                 )
@@ -52,6 +54,9 @@ class WeightTrackerViewModel @Inject constructor(
         }
     }
 
+    fun deleteItem(id: Int) = viewModelScope.launch{
+            repository.deleteRecord(id)
+    }
 
     private fun convertLongToDate(time: Long): String {
         val date = Date(time)

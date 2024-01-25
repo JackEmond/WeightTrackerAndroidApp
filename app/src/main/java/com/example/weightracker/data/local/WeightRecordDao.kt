@@ -2,6 +2,7 @@ package com.example.weightracker.data.local
 
 import androidx.lifecycle.LiveData
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 
@@ -14,6 +15,9 @@ interface WeightRecordDao {
 
     @Query("Select * FROM weightrecord")
     fun getAllWeightsAndDates(): LiveData<List<WeightRecord>>
+
+    @Query("DELETE FROM weightrecord WHERE id = :id")
+    suspend fun deleteById(id: Int)
 
 
 }

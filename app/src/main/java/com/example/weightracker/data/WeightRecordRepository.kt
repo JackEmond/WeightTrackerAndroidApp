@@ -23,4 +23,8 @@ class WeightRecordRepository @Inject constructor(
     }
 
     fun getAllWeightsAndDates(): LiveData<List<WeightRecord>> = localDataSource.getAllWeightsAndDates()
+
+    suspend fun deleteRecord(id: Int) {
+        localDataSource.deleteById(id)
+    }
 }

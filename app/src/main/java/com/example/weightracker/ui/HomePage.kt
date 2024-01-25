@@ -1,6 +1,7 @@
 package com.example.weightracker.ui
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,7 +25,6 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.weightracker.R
-import com.example.weightracker.data.local.WeightRecord
 
 @Composable
 fun HomePage(
@@ -40,24 +40,22 @@ fun HomePage(
         GoToAddWeightPageButton{navController.navigate("addWeight")}
 
         val weightRecords by viewModel.getAllWeightsAndDates().observeAsState(initial = emptyList())
-        DisplayWeights(weightRecords)
+        DisplayWeights(weightRecords, viewModel)
     }
 }
 
-
-
 @Composable
-fun DisplayWeights(weightRecords: List<FormattedWeightRecord>) {
+fun DisplayWeights(weightRecords: List<FormattedWeightRecord>, viewModel: WeightTrackerViewModel) {
     LazyColumn {
         items(weightRecords) { weightRecord ->
-            DisplayWeight(weightRecord)
+            DisplayWeight(weightRecord, viewModel)
         }
     }
 
 }
 
 @Composable
-fun DisplayWeight(weightRecord: FormattedWeightRecord) {
+fun DisplayWeight(weightRecord: FormattedWeightRecord, viewModel: WeightTrackerViewModel) {
     Row(verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier.padding(10.dp)
         ){
@@ -70,7 +68,7 @@ fun DisplayWeight(weightRecord: FormattedWeightRecord) {
             painter = painterResource(id = R.drawable.trash_can),
             contentDescription = "trash_can",
             contentScale = ContentScale.Fit,
-            modifier = Modifier.size(50.dp, 30.dp)
+            modifier = Modifier.size(50.dp, 30.dp).clickable {viewModel.deleteItem(weightRecord.id)}
         )
     }
 }
@@ -119,5 +117,5 @@ fun WeightLossLogoPreview() {
 @Preview(showBackground = true)
 @Composable
 fun DisplayWeightsPreview() {
-    DisplayWeight(FormattedWeightRecord( 200.00F, "12/24/2023"))
+    //DisplayWeight(FormattedWeightRecord( 1, 200.00F, "12/24/2023"),)
 }
