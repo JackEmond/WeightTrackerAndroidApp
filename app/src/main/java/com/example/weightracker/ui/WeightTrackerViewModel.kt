@@ -1,6 +1,5 @@
 package com.example.weightracker.ui
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +21,7 @@ import androidx.lifecycle.map
 data class AddWeightUiState(
     val weight: String = "",
     val date: String = "",
+    val errorMessage: String = ""
 )
 data class FormattedWeightRecord(
     val id: Int,
@@ -38,8 +38,8 @@ class WeightTrackerViewModel @Inject constructor(
     val uiState: StateFlow<AddWeightUiState> = _uiState.asStateFlow()
 
     //Variables to navigate to home page after inserting content into db
-    private val _navigateToNextScreen = mutableStateOf(false)
-    val navigateToNextScreen: State<Boolean> = _navigateToNextScreen
+    private val _navigateHome = mutableStateOf(false)
+    val navigateHome: State<Boolean> = _navigateHome
 
 
     fun getAllWeightsAndDates(): LiveData<List<FormattedWeightRecord>> {
@@ -86,17 +86,30 @@ class WeightTrackerViewModel @Inject constructor(
         val weight = uiState.value.weight.toFloatOrNull()
         val date = uiState.value.date.toDate()?.time
 
-        if (weight == null || date == null) {
+
+        var errorMessage = ""
+        if (weight == null)    errorMessage += "Enter a valid weight!"
+        else if(weight <= 0)   errorMessage += "Weight must be above 0 lbs!"
+        else if(weight > 2000) errorMessage += "Weight must be below 2000 lbs!"
+
+
+
+        //if(date > currentDate) show error
+
+        if(errorMessage != ""){
             _uiState.update {
-                TODO("Not yet implemented")
-                //Pop up error on screen
-                //it.copy(userMessage = R.string.empty_task_message)
+                it.copy(errorMessage = errorMessage)
             }
             return
         }
-        _navigateToNextScreen.value = true
-        addWeightInfoToDatabase(weight, date);
+
+        if (weight == null || date == null) return
+
+        _navigateHome.value = true
+        addWeightInfoToDatabase(weight, date)
     }
+
+
 
     private fun addWeightInfoToDatabase(weight: Float, date: Long)
             = viewModelScope.launch{
@@ -112,7 +125,7 @@ class WeightTrackerViewModel @Inject constructor(
     }
 
     fun onNavigationDone() {
-        _navigateToNextScreen.value = false
+        _navigateHome.value = false
     }
 
 

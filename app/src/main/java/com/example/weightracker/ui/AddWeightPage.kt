@@ -4,6 +4,7 @@ import android.app.DatePickerDialog
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,9 +14,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -51,13 +54,7 @@ fun AddWeightPage(
 {
     val uiState by viewModel.uiState.collectAsState()
 
-    val navigateToNextScreen by viewModel.navigateToNextScreen
-    if (navigateToNextScreen) {
-        LaunchedEffect(Unit) {
-            navController.navigate("home")
-            viewModel.onNavigationDone()
-        }
-    }
+    NavigationHandler(viewModel = viewModel, navController = navController)
 
     Column(
         modifier = Modifier
@@ -68,9 +65,44 @@ fun AddWeightPage(
             .background(colorResource(id = R.color.white)),
         horizontalAlignment = Alignment.CenterHorizontally,
     ){
+
         SquigglyLine(Modifier.weight(1f))
+        BackIconButton(Modifier.weight(1f), navController)
         InnerContent(uiState, viewModel, Modifier.weight(5f))
         SquigglyLine(Modifier.weight(1f))
+    }
+}
+
+@Composable
+fun NavigationHandler(viewModel: WeightTrackerViewModel, navController: NavHostController) {
+    val navigateHome by viewModel.navigateHome
+    if (navigateHome) {
+        LaunchedEffect(Unit) {
+            navController.navigate("home")
+            viewModel.onNavigationDone()
+        }
+    }
+}
+
+
+
+@Composable
+fun BackIconButton(modifier: Modifier, navController: NavHostController) {
+    Box( modifier = modifier.fillMaxWidth()
+    ) {
+        IconButton(
+            modifier = Modifier
+                .align(Alignment.CenterStart)
+                .padding(start = 20.dp),
+            onClick = { navController.navigate("home") }) {
+            Icon(
+                imageVector = Icons.Filled.ArrowBack,
+                contentDescription = "Back",
+                tint = Color.Black,
+
+
+            )
+        }
     }
 }
 
@@ -80,6 +112,8 @@ fun InnerContent(uiState: AddWeightUiState, viewModel: WeightTrackerViewModel, m
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ){
+
+
         Text(
             text = "Add Weight",
             fontSize = 25.sp,
@@ -87,10 +121,12 @@ fun InnerContent(uiState: AddWeightUiState, viewModel: WeightTrackerViewModel, m
             modifier = Modifier.padding(bottom=20.dp)
 
         )
+
         //textDecoration = TextDecoration.Underline, fontSize = 20.dp)
         AddWeightInput(weight = uiState.weight, onWeightChanged = viewModel::updateWeight)
         DateInput(date = uiState.date, onDateChanged = viewModel::updateDate)
         SubmitButton(saveContent = viewModel::saveContent)
+        Text(text = uiState.errorMessage)
     }
 
 }
